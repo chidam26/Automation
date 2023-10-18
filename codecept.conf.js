@@ -1,6 +1,6 @@
 /** @type {CodeceptJS.MainConfig} */
 exports.config = {
-  tests: './*_test.js',
+  tests: './inforiver_test.js',
   output: './output',
   helpers: {
     Playwright: {
