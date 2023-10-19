@@ -13,7 +13,7 @@ Scenario('test something', async ({ I }) => {
   I.fillField('#permanentAddress', 'Trichy');
   I.click('Submit');
   I.see('Chidambaram Natarajan', '#name');
-  I.see('xyz@gmail.com', '#email');
+  I.see('xyz@gmail.com', '#email'); 
   I.see('Trichy', '#currentAddress');
   I.see('Trichy', '#permanentAddress');
 });
