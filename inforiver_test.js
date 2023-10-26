@@ -1,10 +1,9 @@
+const inforiver_resusables = require('./inforiver_resusables.js')
 Feature('inforiver-matrix');
 
-import { getResultFromYearSeriesRegion, clickRow, selectFontStyle, selectFontColor, selectFontWeight, checkFontStyleApplied, setVersionMapping, enableColumnBreakdownNCheck } from './inforiver_resusables'
 
 Scenario ('locate cell',  async ({ I }) => {
-    await I.amOnPage('https://inforiverwebtest-dev.azurewebsites.net/?csvLocation=https://sabareesh-r23.github.io/MatrixCsvAndConfig/Sanity.csv&config=https://sabareesh-r23.github.io/MatrixCsvAndConfig/Sanity.json&URLLoad=true');
-    await I.wait(5)
+    await inforiver_resusables.landingPage();
     const targetYear =  '2018';
     const targetSeries =  'PY';
     const targetRegion = "Brazil";
@@ -12,11 +11,8 @@ Scenario ('locate cell',  async ({ I }) => {
     await I.say(resultCell)
 });
 
-
-
 Scenario ('apply formattings', async ({ I }) => {
-    await I.amOnPage('https://inforiverwebtest-dev.azurewebsites.net/?csvLocation=https://sabareesh-r23.github.io/MatrixCsvAndConfig/Sanity.csv&config=https://sabareesh-r23.github.io/MatrixCsvAndConfig/Sanity.json&URLLoad=true');
-    await I.wait(5)
+    await inforiver_resusables.landingPage()
     const targetRegion = 'USA';
     await clickRow(targetRegion)
     let fontStyle = "Times New Roman"
@@ -28,31 +24,18 @@ Scenario ('apply formattings', async ({ I }) => {
     await checkFontStyleApplied(targetRegion, fontStyle);
 })
 
-Scenario ('notes column', async ({ I }) => {
-    await I.amOnPage('https://inforiverwebtest-dev.azurewebsites.net/?csvLocation=https://sabareesh-r23.github.io/MatrixCsvAndConfig/Sanity.csv&config=https://sabareesh-r23.github.io/MatrixCsvAndConfig/Sanity.json&URLLoad=true');
-    await I.wait(5);
-    await I.click(`//div[@class='toolbar_columnMenu']`);
-    await I.click('Notes Column');
-    const targetRegion = "USA"
-    const targetRegionXpath = `//div[@class='non-sticky-grid-cells']//span[text()="${targetRegion}"]/ancestor::div[5]`;
-    const targetRegionXpathId = await I.grabAttributeFrom(targetRegionXpath, 'id')
-    const notesDiv = `(//div[@class='title-label'])[7]/ancestor::div[1]`
-    const notesDivClass = await I.grabAttributeFrom(notesDiv, 'class')
-    const [rowNumber, colNumber] = targetRegionXpathId.match(/\d+/g);
-    const colNumberFromClass = notesDivClass.match(/\d+/g);
-    const result = `table-row-${rowNumber}_table-col-${colNumberFromClass}`;
-    await I.doubleClick(`//div[@id='${result}']`);
-    await I.click(`.DraftEditor-editorContainer`);
-    await I.pressKey(`U`);
-    await I.click('Save');
-    await I.see('U', `//div[@id='table-row-2_table-col-17']/div/div/div/p`);
-    pause()
+Scenario.only ('notes column', async ({ I }) => {
+    await inforiver_resusables.landingPage()
+    const targetRegion = "USA";
+    const keyPress = "U"
+    await inforiver_resusables.enableNotesColumn()
+    const result = await inforiver_resusables.enterNotes(targetRegion, keyPress)
+    await I.see(keyPress, `//div[@id='${result}']/div/div/div/p`);
 })
 
 Scenario ('set version', async ({ I }) => {
-    await I.amOnPage('https://inforiverwebtest-dev.azurewebsites.net/?csvLocation=https://sabareesh-r23.github.io/MatrixCsvAndConfig/Sanity.csv&config=https://sabareesh-r23.github.io/MatrixCsvAndConfig/Sanity.json&URLLoad=true')
-    await I.wait(5);
-    await setVersionMapping()
-    await enableColumnBreakdownNCheck()
+    await inforiver_resusables.landingPage()
+    await inforiver_resusables.setVersionMapping()
+    await inforiver_resusables.enableColumnBreakdownNCheck()
     await I.dragAndDrop(`//div[text()="2017 PY" and @class = "measure-mapping-content-input-filled-value"]/..`, `//span[text()="Actuals"]/../following-sibling::div`)
 })
