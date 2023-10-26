@@ -24,7 +24,7 @@ Scenario ('apply formattings', async ({ I }) => {
     await checkFontStyleApplied(targetRegion, fontStyle);
 })
 
-Scenario.only ('notes column', async ({ I }) => {
+Scenario ('notes column', async ({ I }) => {
     await inforiver_resusables.landingPage()
     const targetRegion = "USA";
     const keyPress = "U"
@@ -38,4 +38,14 @@ Scenario ('set version', async ({ I }) => {
     await inforiver_resusables.setVersionMapping()
     await inforiver_resusables.enableColumnBreakdownNCheck()
     await I.dragAndDrop(`//div[text()="2017 PY" and @class = "measure-mapping-content-input-filled-value"]/..`, `//span[text()="Actuals"]/../following-sibling::div`)
+})
+
+Scenario.only ('data input', async ({ I }) => {
+    const inputType = "Number"
+    await inforiver_resusables.landingPage()
+    await inforiver_resusables.dataInput(inputType)
+    await inforiver_resusables.editCell()
+    await inforiver_resusables.lockCell()
+    await inforiver_resusables.addNotes()
+    await inforiver_resusables.editNote()
 })

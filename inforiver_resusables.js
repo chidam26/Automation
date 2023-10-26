@@ -21,7 +21,9 @@ module.exports = {
         notesColumn: `//div[@class='toolbar_columnMenu']`,
         notesDiv: `(//div[@class='title-label'])[7]/ancestor::div[1]`,
         notesEditorContainer: `.DraftEditor-editorContainer`,
-    
+        insertTab: '//span[text()="Insert"]',
+        dataInput: `//div[@class='popover-container ']/span[@id="dataInput-b"]`,
+            
     },
     
     async  getResultFromYearSeriesRegion(targetYear, targetSeries, targetRegion) {
@@ -113,5 +115,55 @@ module.exports = {
         await I.pressKey(keyPress);
         await I.click('Save');
         return result;
+    },
+
+    async dataInput (inputType) {
+        await I.click(this.selectors.insertTab)
+        await I.click(this.selectors.dataInput)
+        await I.moveCursorTo(`//span[text()='${inputType}' and @class = 'toolbar-icon-title']/../../..`)
+        await I.wait(2)
+        await I.click(`//span[text()='Insert a new empty series']`)
+        await I.click(`Create`)
+    },
+
+    async editCell () {
+        await I.click(`//div[@id='table-row-0_table-col-20']`) //click on a cell
+        await I.click(`//span[@id="insertCell-d"]/..`) //click on edit cell
+        await I.type(`1000`)
+        await I.pressKey(`Enter`)
+    },
+
+    async lockCell() {
+        await I.click(`//div[@id='table-row-0_table-col-20']`)
+        await I.click(`//div[@class="popover-container preserve--cell-selection "]`)
+        await I.click(`//span[@class="toolbar-icon-title with-icon" and text() = "Lock this cell"]/../../..`)
+        const background = await I.grabCssPropertyFrom(`//div[@id='table-row-0_table-col-20']`, `background`)
+        assert.equal(background, `rgb(221, 221, 221) none repeat scroll 0% 0% / auto padding-box border-box`)
+    },
+
+    async addNotes () {
+        await I.click(`//span[text()="Home"]`);
+        await I.click(this.selectors.notesColumn);
+        await I.click(`//span[text()="Add New Note"]`);
+        await I.type(`Notes added`);
+        await I.click('Save');
+        pause()
+        await I.moveCursorTo(`//div[@class = 'indicator-div circle indicator-icon']`)
+        await I.seeElement(`//div[@class = 'notes-wrapped-container quill-container table comment-popover themeLight']`) //ensure notes appears while hovering
+    },
+
+    async editNote () {
+        await I.moveCursorTo(`//div[@class = 'indicator-div circle indicator-icon']`)
+        await I.click(`//div[@class = 'comment-actions']/div[@class="ms-Icon ms-Icon--Edit"]`)
+        await I.type(` Edited Note`)
+        await I.click(`Save`)
+        await I.moveCursorTo(`//div[@class = 'indicator-div circle indicator-icon']`)
+        await I.seeElement(`//div[@class = 'notes-wrapped-container quill-container table comment-popover themeLight']/div/div/div/p[text()="Notes added Edited Note"]`)
+    },
+
+    async deleteNote () {
+        await I.moveCursorTo(`//div[@class = 'indicator-div circle indicator-icon']`);
+        await I.click(`//div[@class = 'comment-actions']/div[@class="ms-Icon ms-Icon--Delete"]`)
+        await I.dontSee(`//div[@class = 'indicator-div circle indicator-icon']`)
     }
 }
